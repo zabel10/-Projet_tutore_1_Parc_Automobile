@@ -1,0 +1,78 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Mission;
+use App\Models\Vehicule;
+use App\Models\Conducteur;
+use Illuminate\Http\Request;
+
+class MissionController extends Controller
+{
+    public function index()
+    {
+        $missions = Mission::with(['vehicule', 'conducteur', 'createur'])->get();
+        return view('missions.index', compact('missions'));
+    }
+
+    public function create()
+    {
+        $vehicules = Vehicule::where('statut', 'disponible')->get();
+        $conducteurs = Conducteur::all();
+        return view('missions.create', compact('vehicules', 'conducteurs'));
+    }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'id_vehicule' => 'required|exists:vehicules,id_vehicule',
+            'id_conducteur' => 'required|exists:conducteurs,id_conducteur',
+            'date_depart' => 'required|date',
+            'date_retour' => 'required|date|after_or_equal:date_depart',
+            'destination' => 'required|string|max:255',
+            'motif' => 'required|string|max:255',
+            'km_depart' => 'required|integer|min:0',
+        ]);
+
+        $validated['id_utilisateur'] = auth()->id();
+        $validated['statut'] = 'planifiee';
+
+        Mission::create($validated);
+        return redirect()->route('missions.index')->with('success', 'Mission créée avec succès.');
+    }
+
+    public function show(Mission $mission)
+    {
+        return view('missions.show', compact('mission'));
+    }
+
+    public function edit(Mission $mission)
+    {
+        $vehicules = Vehicule::all();
+        $conducteurs = Conducteur::all();
+        return view('missions.edit', compact('mission', 'vehicules', 'conducteurs'));
+    }
+
+    public function update(Request $request, Mission $mission)
+    {
+        $validated = $request->validate([
+            'id_vehicule' => 'required|exists:vehicules,id_vehicule',
+            'id_conducteur' => 'required|exists:conducteurs,id_conducteur',
+            'date_depart' => 'required|date',
+            'date_retour' => 'required|date|after_or_equal:date_depart',
+            'destination' => 'required|string|max:255',
+            'motif' => 'required|string|max:255',
+            'statut' => 'required|in:' . implode(',', Mission::STATUTS),
+            'km_depart' => 'required|integer|min:0',
+        ]);
+
+        $mission->update($validated);
+        return redirect()->route('missions.index')->with('success', 'Mission modifiée avec succès.');
+    }
+
+    public function destroy(Mission $mission)
+    {
+        $mission->delete();
+        return redirect()->route('missions.index')->with('success', 'Mission supprimée avec succès.');
+    }
+}
