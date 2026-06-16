@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Controller;
 use App\Models\Conducteur;
 use App\Models\Utilisateur;
 use Illuminate\Http\Request;
@@ -11,12 +12,12 @@ class ConducteurController extends Controller
     public function index()
     {
         $conducteurs = Conducteur::with('utilisateur')->get();
-        return view('conducteurs.index', compact('conducteurs'));
+        return view('admin.conducteurs.index', compact('conducteurs'));
     }
 
     public function create()
     {
-        return view('conducteurs.create');
+        return view('admin.conducteurs.create');
     }
 
     public function store(Request $request)
@@ -49,17 +50,17 @@ class ConducteurController extends Controller
             'date_naissance' => $validated['date_naissance'],
         ]);
 
-        return redirect()->route('conducteurs.index')->with('success', 'Conducteur créé avec succès.');
+        return redirect()->route('admin.conducteurs.index')->with('success', 'Conducteur créé avec succès.');
     }
 
     public function show(Conducteur $conducteur)
     {
-        return view('conducteurs.show', compact('conducteur'));
+        return view('admin.conducteurs.show', compact('conducteur'));
     }
 
     public function edit(Conducteur $conducteur)
     {
-        return view('conducteurs.edit', compact('conducteur'));
+        return view('admin.conducteurs.edit', compact('conducteur'));
     }
 
     public function update(Request $request, Conducteur $conducteur)
@@ -94,12 +95,12 @@ class ConducteurController extends Controller
             'date_naissance' => $validated['date_naissance'],
         ]);
 
-        return redirect()->route('conducteurs.index')->with('success', 'Conducteur modifié avec succès.');
+        return redirect()->route('admin.conducteurs.index')->with('success', 'Conducteur modifié avec succès.');
     }
 
     public function destroy(Conducteur $conducteur)
     {
         $conducteur->utilisateur->delete();
-        return redirect()->route('conducteurs.index')->with('success', 'Conducteur supprimé avec succès.');
+        return redirect()->route('admin.conducteurs.index')->with('success', 'Conducteur supprimé avec succès.');
     }
 }

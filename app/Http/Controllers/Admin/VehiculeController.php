@@ -1,24 +1,27 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\Controller;
 use App\Models\Vehicule;
-use Illuminate\Http\Request;
+use App\Models\Conducteur;
+use App\Models\Mission;
+use App\Models\Alerte;
 
 class VehiculeController extends Controller
 {
     public function index()
     {
         $vehicules = Vehicule::all();
-        return view('vehicules.index', compact('vehicules'));
+        return view('admin.vehicules.index', compact('vehicules'));
     }
 
     public function create()
     {
-        return view('vehicules.create');
+        return view('admin.vehicules.create');
     }
 
-    public function store(Request $request)
+    public function store(\Illuminate\Http\Request $request)
     {
         $validated = $request->validate([
             'immatriculation' => 'required|string|max:255|unique:vehicules',
@@ -33,20 +36,20 @@ class VehiculeController extends Controller
         ]);
 
         Vehicule::create($validated);
-        return redirect()->route('vehicules.index')->with('success', 'Véhicule créé avec succès.');
+        return redirect()->route('admin.vehicules.index')->with('success', 'Véhicule créé avec succès.');
     }
 
     public function show(Vehicule $vehicule)
     {
-        return view('vehicules.show', compact('vehicule'));
+        return view('admin.vehicules.show', compact('vehicule'));
     }
 
     public function edit(Vehicule $vehicule)
     {
-        return view('vehicules.edit', compact('vehicule'));
+        return view('admin.vehicules.edit', compact('vehicule'));
     }
 
-    public function update(Request $request, Vehicule $vehicule)
+    public function update(\Illuminate\Http\Request $request, Vehicule $vehicule)
     {
         $validated = $request->validate([
             'immatriculation' => 'required|string|max:255|unique:vehicules,immatriculation,' . $vehicule->id_vehicule . ',id_vehicule',
@@ -61,12 +64,12 @@ class VehiculeController extends Controller
         ]);
 
         $vehicule->update($validated);
-        return redirect()->route('vehicules.index')->with('success', 'Véhicule modifié avec succès.');
+        return redirect()->route('admin.vehicules.index')->with('success', 'Véhicule modifié avec succès.');
     }
 
     public function destroy(Vehicule $vehicule)
     {
         $vehicule->delete();
-        return redirect()->route('vehicules.index')->with('success', 'Véhicule supprimé avec succès.');
+        return redirect()->route('admin.vehicules.index')->with('success', 'Véhicule supprimé avec succès.');
     }
 }

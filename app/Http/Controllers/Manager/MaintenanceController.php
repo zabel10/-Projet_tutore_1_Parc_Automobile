@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Manager;
 
+use App\Http\Controllers\Controller;
 use App\Models\Maintenance;
 use App\Models\Vehicule;
 use Illuminate\Http\Request;
@@ -11,13 +12,13 @@ class MaintenanceController extends Controller
     public function index()
     {
         $maintenances = Maintenance::with('vehicule')->get();
-        return view('maintenances.index', compact('maintenances'));
+        return view('manager.maintenances.index', compact('maintenances'));
     }
 
     public function create()
     {
         $vehicules = Vehicule::all();
-        return view('maintenances.create', compact('vehicules'));
+        return view('manager.maintenances.create', compact('vehicules'));
     }
 
     public function store(Request $request)
@@ -34,18 +35,18 @@ class MaintenanceController extends Controller
         ]);
 
         Maintenance::create($validated);
-        return redirect()->route('maintenances.index')->with('success', 'Maintenance enregistrée avec succès.');
+        return redirect()->route('manager.maintenances.index')->with('success', 'Maintenance enregistrée avec succès.');
     }
 
     public function show(Maintenance $maintenance)
     {
-        return view('maintenances.show', compact('maintenance'));
+        return view('manager.maintenances.show', compact('maintenance'));
     }
 
     public function edit(Maintenance $maintenance)
     {
         $vehicules = Vehicule::all();
-        return view('maintenances.edit', compact('maintenance', 'vehicules'));
+        return view('manager.maintenances.edit', compact('maintenance', 'vehicules'));
     }
 
     public function update(Request $request, Maintenance $maintenance)
@@ -62,12 +63,12 @@ class MaintenanceController extends Controller
         ]);
 
         $maintenance->update($validated);
-        return redirect()->route('maintenances.index')->with('success', 'Maintenance modifiée avec succès.');
+        return redirect()->route('manager.maintenances.index')->with('success', 'Maintenance modifiée avec succès.');
     }
 
     public function destroy(Maintenance $maintenance)
     {
         $maintenance->delete();
-        return redirect()->route('maintenances.index')->with('success', 'Maintenance supprimée avec succès.');
+        return redirect()->route('manager.maintenances.index')->with('success', 'Maintenance supprimée avec succès.');
     }
 }

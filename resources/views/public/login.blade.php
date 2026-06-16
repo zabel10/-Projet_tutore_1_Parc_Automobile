@@ -1,37 +1,46 @@
-<!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Connexion - AutoPark</title>
-    <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
-</head>
-<body class="bg-gray-50 min-h-screen flex items-center justify-center">
-    <div class="max-w-md w-full bg-white rounded-lg shadow-lg p-8">
-        <h1 class="text-2xl font-bold text-center text-gray-800 mb-6">Connexion</h1>
+@extends('layouts.app')
 
-        <form method="POST" action="/api/login">
-            @csrf
-            <div class="mb-4">
-                <label class="block text-gray-700 text-sm font-bold mb-2">Email</label>
-                <input type="email" name="email" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+@section('title', 'Connexion')
+
+@section('content')
+<section class="section-padding" style="padding-top: 120px; min-height: calc(100vh - 80px); display: flex; align-items: center;">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-5">
+                <div class="card-custom p-5" data-aos="fade-up">
+                    <div class="text-center mb-5">
+                        <i class="bi bi-car-front-fill text-blue-primary fs-1 mb-3"></i>
+                        <h1 class="display-6 fw-bold text-blue-dark mb-2">Connexion</h1>
+                        <p class="text-muted">Accédez à votre espace AutoPark</p>
+                    </div>
+
+                    <form method="POST" action="{{ route('login') }}">
+                        @csrf
+
+                        <div class="mb-4">
+                            <label for="email" class="form-label text-blue-dark">Email</label>
+                            <input type="email" class="form-input-custom" id="email" name="email" placeholder="votre@email.com" required>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="mot_de_passe" class="form-label text-blue-dark">Mot de passe</label>
+                            <input type="password" class="form-input-custom" id="mot_de_passe" name="mot_de_passe" placeholder="Votre mot de passe" required>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary-custom w-100 mb-4">
+                            Se connecter
+                        </button>
+                    </form>
+
+                    <div class="text-center">
+                        <p class="text-muted mb-0">
+                            Pas encore inscrit ?
+                            <a href="{{ route('register') }}" class="text-blue-primary text-decoration-none fw-semibold">Créer un compte</a>
+                        </p>
+                    </div>
+                </div>
             </div>
-
-            <div class="mb-6">
-                <label class="block text-gray-700 text-sm font-bold mb-2">Mot de passe</label>
-                <input type="password" name="mot_de_passe" required class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-            </div>
-
-            <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded-lg font-semibold hover:bg-blue-700 transition">
-                Se connecter
-            </button>
-        </form>
-
-        <div class="mt-4 text-center">
-            <a href="/register" class="text-blue-600 hover:underline text-sm">Pas encore inscrit ? Créer un compte</a>
         </div>
     </div>
-</body>
-</html>
+</section>
+@endsection
