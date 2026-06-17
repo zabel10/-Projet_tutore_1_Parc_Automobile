@@ -35,9 +35,34 @@ class Conducteur extends Model
         return $this->hasMany(Mission::class, 'id_conducteur');
     }
 
+    public function affectations()
+    {
+        return $this->hasMany(Affectation::class, 'id_conducteur');
+    }
+
     public function carburants()
     {
         return $this->hasMany(Carburant::class, 'id_conducteur');
+    }
+
+    public function bonsSortie()
+    {
+        return $this->hasMany(BonSortie::class, 'id_conducteur');
+    }
+
+    public function demandes()
+    {
+        return $this->hasMany(Demande::class, 'id_conducteur');
+    }
+
+    public function documents()
+    {
+        return $this->hasMany(Document::class, 'id_conducteur');
+    }
+
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class, 'id_conducteur');
     }
 
     // Vérifie si le permis expire dans moins de X jours

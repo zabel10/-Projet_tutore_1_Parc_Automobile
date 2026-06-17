@@ -19,9 +19,16 @@ use App\Http\Controllers\Manager\MaintenanceController as ManagerMaintenanceCont
 use App\Http\Controllers\Manager\CarburantController as ManagerCarburantController;
 use App\Http\Controllers\Manager\AssuranceController as ManagerAssuranceController;
 use App\Http\Controllers\Manager\AlerteController as ManagerAlerteController;
-use App\Http\Controllers\Driver\DashboardController as DriverDashboardController;
-use App\Http\Controllers\Driver\MissionController as DriverMissionController;
-use App\Http\Controllers\Driver\CarburantController as DriverCarburantController;
+use App\Http\Controllers\Driver\AffectationController;
+use App\Http\Controllers\Driver\DashboardController;
+use App\Http\Controllers\Driver\MissionController;
+use App\Http\Controllers\Driver\CarburantController;
+use App\Http\Controllers\Driver\MaintenanceController;
+use App\Http\Controllers\Driver\NotificationController;
+use App\Http\Controllers\Driver\DocumentController;
+use App\Http\Controllers\Driver\BonSortieController;
+use App\Http\Controllers\Driver\DemandeController;
+use App\Http\Controllers\Driver\ProfilController;
 
 /*
 |--------------------------------------------------------------------------
@@ -47,8 +54,8 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 */
 
 Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
-    
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
     Route::resource('vehicules', AdminVehiculeController::class);
     Route::resource('conducteurs', AdminConducteurController::class);
     Route::resource('missions', AdminMissionController::class);
@@ -64,7 +71,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
 Route::middleware(['auth', 'role:gestionnaire'])->prefix('manager')->name('manager.')->group(function () {
     Route::get('/dashboard', [ManagerDashboardController::class, 'index'])->name('dashboard');
-    
+
     Route::resource('vehicules', ManagerVehiculeController::class);
     Route::resource('conducteurs', ManagerConducteurController::class);
     Route::resource('missions', ManagerMissionController::class);
@@ -81,12 +88,35 @@ Route::middleware(['auth', 'role:gestionnaire'])->prefix('manager')->name('manag
 */
 
 Route::middleware(['auth', 'role:conducteur'])->prefix('driver')->name('driver.')->group(function () {
-    Route::get('/dashboard', [DriverDashboardController::class, 'index'])->name('dashboard');
-    
-    Route::get('/missions', [DriverMissionController::class, 'index'])->name('missions.index');
-    Route::get('/missions/{mission}', [DriverMissionController::class, 'show'])->name('missions.show');
-    
-    Route::get('/carburants', [DriverCarburantController::class, 'index'])->name('carburants.index');
-    Route::get('/carburants/create', [DriverCarburantController::class, 'create'])->name('carburants.create');
-    Route::post('/carburants', [DriverCarburantController::class, 'store'])->name('carburants.store');
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    Route::get('/profil', [ProfilController::class, 'edit'])->name('profil.edit');
+    Route::patch('/profil', [ProfilController::class, 'update'])->name('profil.update');
+
+    Route::get('/missions', [MissionController::class, 'index'])->name('missions.index');
+    Route::get('/missions/{mission}', [MissionController::class, 'show'])->name('missions.show');
+
+    Route::get('/affectations', [AffectationController::class, 'index'])->name('affectations.index');
+    Route::get('/affectations/{affectation}', [AffectationController::class, 'show'])->name('affectations.show');
+
+    Route::get('/bons-sortie', [BonSortieController::class, 'index'])->name('bons-sortie.index');
+    Route::get('/bons-sortie/create', [BonSortieController::class, 'create'])->name('bons-sortie.create');
+    Route::post('/bons-sortie', [BonSortieController::class, 'store'])->name('bons-sortie.store');
+
+    Route::get('/demandes', [DemandeController::class, 'index'])->name('demandes.index');
+    Route::get('/demandes/create', [DemandeController::class, 'create'])->name('demandes.create');
+    Route::post('/demandes', [DemandeController::class, 'store'])->name('demandes.store');
+
+    Route::get('/carburants', [CarburantController::class, 'index'])->name('carburants.index');
+    Route::get('/carburants/create', [CarburantController::class, 'create'])->name('carburants.create');
+    Route::post('/carburants', [CarburantController::class, 'store'])->name('carburants.store');
+
+    Route::get('/maintenances', [MaintenanceController::class, 'index'])->name('maintenances.index');
+
+    Route::get('/documents', [DocumentController::class, 'index'])->name('documents.index');
+    Route::get('/documents/create', [DocumentController::class, 'create'])->name('documents.create');
+    Route::post('/documents', [DocumentController::class, 'store'])->name('documents.store');
+
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/{notification}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
 });

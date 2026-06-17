@@ -49,6 +49,16 @@ class Mission extends Model
         return $this->belongsTo(Utilisateur::class, 'id_utilisateur');
     }
 
+    public function bonSortie()
+    {
+        return $this->hasOne(BonSortie::class, 'id_mission');
+    }
+
+    public function affectation()
+    {
+        return $this->hasOne(Affectation::class, 'id_mission');
+    }
+
     // Distance parcourue
     public function getDistanceAttribute(): ?int
     {

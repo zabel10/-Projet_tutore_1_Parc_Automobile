@@ -11,12 +11,24 @@ class MissionController extends Controller
     public function index()
     {
         $conducteur = auth()->user()->conducteur;
-        $missions = Mission::with('vehicule')->where('id_conducteur', $conducteur->id_conducteur)->get();
+        abort_unless($conducteur, 403, 'Profil conducteur introuvable.');
+
+        $missions = Mission::with('vehicule')
+            ->where('id_conducteur', $conducteur->id_conducteur)
+            ->orderByDesc('date_depart')
+            ->paginate(10);
+
         return view('driver.missions.index', compact('missions'));
     }
 
     public function show(Mission $mission)
     {
+        $conducteur = auth()->user()->conducteur;
+        abort_unless($conducteur, 403, 'Profil conducteur introuvable.');
+        abort_unless($mission->id_conducteur === $conducteur->id_conducteur, 403);
+
+        $mission->load('vehicule', 'bonSortie');
+
         return view('driver.missions.show', compact('mission'));
     }
 }

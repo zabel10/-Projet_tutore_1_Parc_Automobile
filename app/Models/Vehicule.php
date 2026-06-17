@@ -38,6 +38,11 @@ class Vehicule extends Model
         return $this->hasMany(Mission::class, 'id_vehicule');
     }
 
+    public function affectations()
+    {
+        return $this->hasMany(Affectation::class, 'id_vehicule');
+    }
+
     public function maintenances()
     {
         return $this->hasMany(Maintenance::class, 'id_vehicule');
@@ -56,5 +61,25 @@ class Vehicule extends Model
     public function assurances()
     {
         return $this->hasMany(Assurance::class, 'id_vehicule');
+    }
+
+    public function bonsSortie()
+    {
+        return $this->hasMany(BonSortie::class, 'id_vehicule');
+    }
+
+    public function demandes()
+    {
+        return $this->hasMany(Demande::class, 'id_vehicule');
+    }
+
+    public function documents()
+    {
+        return $this->hasMany(Document::class, 'id_vehicule');
+    }
+
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class, 'id_vehicule');
     }
 }
