@@ -12,12 +12,12 @@ class ConducteurController extends Controller
     public function index()
     {
         $conducteurs = Conducteur::with('utilisateur')->get();
-        return view('manager.conducteurs.index', compact('conducteurs'));
+        return view('admin.conducteurs.index', compact('conducteurs'));
     }
 
     public function create()
     {
-        return view('manager.conducteurs.create');
+        return view('admin.conducteurs.create');
     }
 
     public function store(Request $request)
@@ -50,17 +50,17 @@ class ConducteurController extends Controller
             'date_naissance' => $validated['date_naissance'],
         ]);
 
-        return redirect()->route('manager.conducteurs.index')->with('success', 'Conducteur créé avec succès.');
+        return redirect()->route('admin.conducteurs.index')->with('success', 'Conducteur créé avec succès.');
     }
 
     public function show(Conducteur $conducteur)
     {
-        return view('manager.conducteurs.show', compact('conducteur'));
+        return view('admin.conducteurs.show', compact('conducteur'));
     }
 
     public function edit(Conducteur $conducteur)
     {
-        return view('manager.conducteurs.edit', compact('conducteur'));
+        return view('admin.conducteurs.edit', compact('conducteur'));
     }
 
     public function update(Request $request, Conducteur $conducteur)
@@ -95,12 +95,12 @@ class ConducteurController extends Controller
             'date_naissance' => $validated['date_naissance'],
         ]);
 
-        return redirect()->route('manager.conducteurs.index')->with('success', 'Conducteur modifié avec succès.');
+        return redirect()->route('admin.conducteurs.index')->with('success', 'Conducteur modifié avec succès.');
     }
 
     public function destroy(Conducteur $conducteur)
     {
         $conducteur->utilisateur->delete();
-        return redirect()->route('manager.conducteurs.index')->with('success', 'Conducteur supprimé avec succès.');
+        return redirect()->route('admin.conducteurs.index')->with('success', 'Conducteur supprimé avec succès.');
     }
 }

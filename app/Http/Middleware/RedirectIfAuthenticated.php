@@ -21,7 +21,7 @@ class RedirectIfAuthenticated
     {
         return match ($role) {
             'admin' => redirect()->route('admin.dashboard'),
-            'gestionnaire' => redirect()->route('manager.dashboard'),
+            'gestionnaire' => redirect()->route('admin.dashboard'),
             'conducteur' => redirect()->route('driver.dashboard'),
             default => redirect()->route('home'),
         };

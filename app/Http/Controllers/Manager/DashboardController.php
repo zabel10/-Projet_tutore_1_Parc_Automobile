@@ -19,6 +19,6 @@ class DashboardController extends Controller
             'alertes_actives' => Alerte::where('statut', 'active')->count(),
         ];
 
-        return view('manager.dashboard', compact('stats'));
+        return view('admin.dashboard', compact('stats'));
     }
 }

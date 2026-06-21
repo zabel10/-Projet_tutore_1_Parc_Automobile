@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('documents', function (Blueprint $table) {
             $table->bigIncrements('id_document');
-            $table->unsignedBigInteger('id_conducteur');
+            $table->unsignedBigInteger('id_conducteur')->nullable();
             $table->unsignedBigInteger('id_vehicule')->nullable();
             $table->unsignedBigInteger('id_utilisateur')->nullable();
             $table->enum('type_document', ['permis', 'carte_grise', 'assurance', 'visite_technique', 'autre'])->default('autre');
@@ -24,7 +24,7 @@ return new class extends Migration
             $table->foreign('id_conducteur')
                 ->references('id_conducteur')
                 ->on('conducteurs')
-                ->onDelete('restrict')
+                ->onDelete('set null')
                 ->onUpdate('cascade');
 
             $table->foreign('id_vehicule')

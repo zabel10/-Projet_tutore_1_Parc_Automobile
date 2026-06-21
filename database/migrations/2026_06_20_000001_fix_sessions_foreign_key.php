@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('id')->primary();
             $table->unsignedBigInteger('user_id')->nullable()->index();
             $table->foreign('user_id')
-                ->references('id_utilisateur')
+                ->references('id')
                 ->on('utilisateurs')
                 ->onDelete('cascade');
             $table->string('ip_address', 45)->nullable();

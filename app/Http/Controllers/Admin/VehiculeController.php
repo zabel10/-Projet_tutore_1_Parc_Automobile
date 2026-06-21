@@ -7,6 +7,8 @@ use App\Models\Vehicule;
 use App\Models\Conducteur;
 use App\Models\Mission;
 use App\Models\Alerte;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class VehiculeController extends Controller
 {
@@ -21,7 +23,7 @@ class VehiculeController extends Controller
         return view('admin.vehicules.create');
     }
 
-    public function store(\Illuminate\Http\Request $request)
+    public function store(Request $request)
     {
         $validated = $request->validate([
             'immatriculation' => 'required|string|max:255|unique:vehicules',
@@ -33,7 +35,12 @@ class VehiculeController extends Controller
             'carburant' => 'required|string|max:255',
             'couleur' => 'required|string|max:255',
             'date_acquisition' => 'required|date',
+            'photo' => 'nullable|image|max:4096',
         ]);
+
+        if ($request->hasFile('photo')) {
+            $validated['photo_path'] = $request->file('photo')->store('photos/vehicles', 'public');
+        }
 
         Vehicule::create($validated);
         return redirect()->route('admin.vehicules.index')->with('success', 'Véhicule créé avec succès.');
@@ -49,7 +56,7 @@ class VehiculeController extends Controller
         return view('admin.vehicules.edit', compact('vehicule'));
     }
 
-    public function update(\Illuminate\Http\Request $request, Vehicule $vehicule)
+    public function update(Request $request, Vehicule $vehicule)
     {
         $validated = $request->validate([
             'immatriculation' => 'required|string|max:255|unique:vehicules,immatriculation,' . $vehicule->id_vehicule . ',id_vehicule',
@@ -61,7 +68,15 @@ class VehiculeController extends Controller
             'carburant' => 'required|string|max:255',
             'couleur' => 'required|string|max:255',
             'date_acquisition' => 'required|date',
+            'photo' => 'nullable|image|max:4096',
         ]);
+
+        if ($request->hasFile('photo')) {
+            if ($vehicule->photo_path) {
+                Storage::disk('public')->delete($vehicule->photo_path);
+            }
+            $validated['photo_path'] = $request->file('photo')->store('photos/vehicles', 'public');
+        }
 
         $vehicule->update($validated);
         return redirect()->route('admin.vehicules.index')->with('success', 'Véhicule modifié avec succès.');
@@ -69,6 +84,9 @@ class VehiculeController extends Controller
 
     public function destroy(Vehicule $vehicule)
     {
+        if ($vehicule->photo_path) {
+            Storage::disk('public')->delete($vehicule->photo_path);
+        }
         $vehicule->delete();
         return redirect()->route('admin.vehicules.index')->with('success', 'Véhicule supprimé avec succès.');
     }

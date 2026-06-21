@@ -11,6 +11,14 @@ use App\Http\Controllers\Admin\ConducteurController as AdminConducteurController
 use App\Http\Controllers\Admin\MissionController as AdminMissionController;
 use App\Http\Controllers\Admin\MaintenanceController as AdminMaintenanceController;
 use App\Http\Controllers\Admin\AlerteController as AdminAlerteController;
+use App\Http\Controllers\Admin\CarburantController as AdminCarburantController;
+use App\Http\Controllers\Admin\AssuranceController as AdminAssuranceController;
+use App\Http\Controllers\Admin\ReservationController as AdminReservationController;
+use App\Http\Controllers\Admin\RapportController as AdminRapportController;
+use App\Http\Controllers\Admin\UtilisateurController as AdminUtilisateurController;
+use App\Http\Controllers\Admin\RoleController as AdminRoleController;
+use App\Http\Controllers\Admin\ParametreController as AdminParametreController;
+use App\Http\Controllers\Admin\ProfilController as AdminProfilController;
 use App\Http\Controllers\Manager\DashboardController as ManagerDashboardController;
 use App\Http\Controllers\Manager\VehiculeController as ManagerVehiculeController;
 use App\Http\Controllers\Manager\ConducteurController as ManagerConducteurController;
@@ -19,6 +27,8 @@ use App\Http\Controllers\Manager\MaintenanceController as ManagerMaintenanceCont
 use App\Http\Controllers\Manager\CarburantController as ManagerCarburantController;
 use App\Http\Controllers\Manager\AssuranceController as ManagerAssuranceController;
 use App\Http\Controllers\Manager\AlerteController as ManagerAlerteController;
+use App\Http\Controllers\Admin\BonSortieController as AdminBonSortieController;
+use App\Http\Controllers\Admin\DemandeController as AdminDemandeController;
 use App\Http\Controllers\Driver\AffectationController;
 use App\Http\Controllers\Driver\DashboardController;
 use App\Http\Controllers\Driver\MissionController;
@@ -41,7 +51,6 @@ Route::get('/presentation', [PresentationController::class, 'index'])->name('pre
 Route::get('/contact', [ContactController::class, 'index'])->name('contact.index');
 Route::post('/contact', [ContactController::class, 'store'])->middleware('throttle:10,1')->name('contact.store');
 
-// Authentification protégée par le middleware guest personnalisé
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1');
@@ -53,11 +62,11 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 /*
 |--------------------------------------------------------------------------
-| ESPACE ADMIN
+| ESPACE ADMIN UNIFIÉ (ADMIN + GESTIONNAIRE)
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth', 'ensure.role:admin', 'throttle:120,1'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'role:admin,gestionnaire', 'throttle:120,1'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
 
     Route::resource('vehicules', AdminVehiculeController::class);
@@ -65,24 +74,33 @@ Route::middleware(['auth', 'ensure.role:admin', 'throttle:120,1'])->prefix('admi
     Route::resource('missions', AdminMissionController::class);
     Route::resource('maintenances', AdminMaintenanceController::class);
     Route::resource('alertes', AdminAlerteController::class);
-});
+    Route::resource('carburants', AdminCarburantController::class);
+    Route::resource('assurances', AdminAssuranceController::class);
 
-/*
-|--------------------------------------------------------------------------
-| ESPACE GESTIONNAIRE
-|--------------------------------------------------------------------------
-*/
+    Route::get('reservations', [AdminReservationController::class, 'index'])->name('reservations.index');
+    Route::get('rapports', [AdminRapportController::class, 'index'])->name('rapports.index');
+    Route::get('demandes', [AdminDemandeController::class, 'index'])->name('demandes.index');
+    Route::get('demandes/{demande}', [AdminDemandeController::class, 'show'])->name('demandes.show');
+    Route::patch('demandes/{demande}', [AdminDemandeController::class, 'update'])->name('demandes.update');
+    Route::get('bons-sortie', [AdminBonSortieController::class, 'index'])->name('bons-sortie.index');
+    Route::get('bons-sortie/{bonSortie}', [AdminBonSortieController::class, 'show'])->name('bons-sortie.show');
+    Route::patch('bons-sortie/{bonSortie}', [AdminBonSortieController::class, 'update'])->name('bons-sortie.update');
 
-Route::middleware(['auth', 'ensure.role:manager', 'throttle:120,1'])->prefix('manager')->name('manager.')->group(function () {
-    Route::get('/dashboard', [ManagerDashboardController::class, 'index'])->name('dashboard');
+    Route::middleware('can:manage_users')->group(function () {
+        Route::resource('utilisateurs', AdminUtilisateurController::class);
+        Route::get('roles', [AdminRoleController::class, 'index'])->name('roles.index');
+    });
 
-    Route::resource('vehicules', ManagerVehiculeController::class);
-    Route::resource('conducteurs', ManagerConducteurController::class);
-    Route::resource('missions', ManagerMissionController::class);
-    Route::resource('maintenances', ManagerMaintenanceController::class);
-    Route::resource('carburants', ManagerCarburantController::class);
-    Route::resource('assurances', ManagerAssuranceController::class);
-    Route::resource('alertes', ManagerAlerteController::class);
+    Route::get('parametres', [AdminParametreController::class, 'index'])->name('parametres.index');
+    Route::get('profil', [AdminProfilController::class, 'edit'])->name('profil.edit');
+    Route::patch('profil', [AdminProfilController::class, 'update'])->name('profil.update');
+
+    Route::fallback(function () {
+        if (request()->expectsJson()) {
+            return response()->json(['message' => 'Ressource non trouvée.'], 404);
+        }
+        return view('errors.403');
+    });
 });
 
 /*

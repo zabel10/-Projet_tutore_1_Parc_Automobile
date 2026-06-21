@@ -18,6 +18,7 @@ class Conducteur extends Model
         'date_expiration_permis',
         'categorie_permis',
         'date_naissance',
+        'photo_path',
     ];
 
     protected $casts = [

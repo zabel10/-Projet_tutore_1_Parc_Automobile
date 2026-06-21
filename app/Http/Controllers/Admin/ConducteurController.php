@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Conducteur;
 use App\Models\Utilisateur;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class ConducteurController extends Controller
 {
@@ -32,6 +33,7 @@ class ConducteurController extends Controller
             'date_expiration_permis' => 'required|date|after:today',
             'categorie_permis' => 'required|string|max:255',
             'date_naissance' => 'required|date|before:today',
+            'photo' => 'nullable|image|max:4096',
         ]);
 
         $utilisateur = Utilisateur::create([
@@ -43,12 +45,18 @@ class ConducteurController extends Controller
             'telephone' => $validated['telephone'],
         ]);
 
-        $utilisateur->conducteur()->create([
+        $data = [
             'num_permis' => $validated['num_permis'],
             'date_expiration_permis' => $validated['date_expiration_permis'],
             'categorie_permis' => $validated['categorie_permis'],
             'date_naissance' => $validated['date_naissance'],
-        ]);
+        ];
+
+        if ($request->hasFile('photo')) {
+            $data['photo_path'] = $request->file('photo')->store('photos/conducteurs', 'public');
+        }
+
+        $utilisateur->conducteur()->create($data);
 
         return redirect()->route('admin.conducteurs.index')->with('success', 'Conducteur créé avec succès.');
     }
@@ -75,6 +83,7 @@ class ConducteurController extends Controller
             'date_expiration_permis' => 'required|date',
             'categorie_permis' => 'required|string|max:255',
             'date_naissance' => 'required|date',
+            'photo' => 'nullable|image|max:4096',
         ]);
 
         $conducteur->utilisateur->update([
@@ -88,18 +97,30 @@ class ConducteurController extends Controller
             $conducteur->utilisateur->update(['mot_de_passe' => bcrypt($validated['mot_de_passe'])]);
         }
 
-        $conducteur->update([
+        $data = [
             'num_permis' => $validated['num_permis'],
             'date_expiration_permis' => $validated['date_expiration_permis'],
             'categorie_permis' => $validated['categorie_permis'],
             'date_naissance' => $validated['date_naissance'],
-        ]);
+        ];
+
+        if ($request->hasFile('photo')) {
+            if ($conducteur->photo_path) {
+                Storage::disk('public')->delete($conducteur->photo_path);
+            }
+            $data['photo_path'] = $request->file('photo')->store('photos/conducteurs', 'public');
+        }
+
+        $conducteur->update($data);
 
         return redirect()->route('admin.conducteurs.index')->with('success', 'Conducteur modifié avec succès.');
     }
 
     public function destroy(Conducteur $conducteur)
     {
+        if ($conducteur->photo_path) {
+            Storage::disk('public')->delete($conducteur->photo_path);
+        }
         $conducteur->utilisateur->delete();
         return redirect()->route('admin.conducteurs.index')->with('success', 'Conducteur supprimé avec succès.');
     }

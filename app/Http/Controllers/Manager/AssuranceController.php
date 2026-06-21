@@ -12,13 +12,13 @@ class AssuranceController extends Controller
     public function index()
     {
         $assurances = Assurance::with('vehicule')->get();
-        return view('manager.assurances.index', compact('assurances'));
+        return view('admin.assurances.index', compact('assurances'));
     }
 
     public function create()
     {
         $vehicules = Vehicule::all();
-        return view('manager.assurances.create', compact('vehicules'));
+        return view('admin.assurances.create', compact('vehicules'));
     }
 
     public function store(Request $request)
@@ -34,18 +34,18 @@ class AssuranceController extends Controller
         ]);
 
         Assurance::create($validated);
-        return redirect()->route('manager.assurances.index')->with('success', 'Assurance créée avec succès.');
+        return redirect()->route('admin.assurances.index')->with('success', 'Assurance créée avec succès.');
     }
 
     public function show(Assurance $assurance)
     {
-        return view('manager.assurances.show', compact('assurance'));
+        return view('admin.assurances.show', compact('assurance'));
     }
 
     public function edit(Assurance $assurance)
     {
         $vehicules = Vehicule::all();
-        return view('manager.assurances.edit', compact('assurance', 'vehicules'));
+        return view('admin.assurances.edit', compact('assurance', 'vehicules'));
     }
 
     public function update(Request $request, Assurance $assurance)
@@ -61,12 +61,12 @@ class AssuranceController extends Controller
         ]);
 
         $assurance->update($validated);
-        return redirect()->route('manager.assurances.index')->with('success', 'Assurance modifiée avec succès.');
+        return redirect()->route('admin.assurances.index')->with('success', 'Assurance modifiée avec succès.');
     }
 
     public function destroy(Assurance $assurance)
     {
         $assurance->delete();
-        return redirect()->route('manager.assurances.index')->with('success', 'Assurance supprimée avec succès.');
+        return redirect()->route('admin.assurances.index')->with('success', 'Assurance supprimée avec succès.');
     }
 }

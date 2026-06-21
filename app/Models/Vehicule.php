@@ -22,6 +22,7 @@ class Vehicule extends Model
         'carburant',
         'couleur',
         'date_acquisition',
+        'photo_path',
     ];
 
     protected $casts = [

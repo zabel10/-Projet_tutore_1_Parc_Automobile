@@ -41,7 +41,7 @@ class EnsureRole
     {
         return match ($role) {
             'admin' => 'admin.dashboard',
-            'gestionnaire' => 'manager.dashboard',
+            'gestionnaire' => 'admin.dashboard',
             'conducteur' => 'driver.dashboard',
             default => 'home',
         };

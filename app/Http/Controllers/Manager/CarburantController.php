@@ -13,14 +13,14 @@ class CarburantController extends Controller
     public function index()
     {
         $carburants = Carburant::with(['vehicule', 'conducteur'])->get();
-        return view('manager.carburants.index', compact('carburants'));
+        return view('admin.carburants.index', compact('carburants'));
     }
 
     public function create()
     {
         $vehicules = Vehicule::all();
         $conducteurs = Conducteur::all();
-        return view('manager.carburants.create', compact('vehicules', 'conducteurs'));
+        return view('admin.carburants.create', compact('vehicules', 'conducteurs'));
     }
 
     public function store(Request $request)
@@ -37,19 +37,19 @@ class CarburantController extends Controller
         $validated['cout_total'] = $validated['quantite_litres'] * $validated['prix_litre'];
 
         Carburant::create($validated);
-        return redirect()->route('manager.carburants.index')->with('success', 'Plein enregistré avec succès.');
+        return redirect()->route('admin.carburants.index')->with('success', 'Plein enregistré avec succès.');
     }
 
     public function show(Carburant $carburant)
     {
-        return view('manager.carburants.show', compact('carburant'));
+        return view('admin.carburants.show', compact('carburant'));
     }
 
     public function edit(Carburant $carburant)
     {
         $vehicules = Vehicule::all();
         $conducteurs = Conducteur::all();
-        return view('manager.carburants.edit', compact('carburant', 'vehicules', 'conducteurs'));
+        return view('admin.carburants.edit', compact('carburant', 'vehicules', 'conducteurs'));
     }
 
     public function update(Request $request, Carburant $carburant)
@@ -66,12 +66,12 @@ class CarburantController extends Controller
         $validated['cout_total'] = $validated['quantite_litres'] * $validated['prix_litre'];
 
         $carburant->update($validated);
-        return redirect()->route('manager.carburants.index')->with('success', 'Plein modifié avec succès.');
+        return redirect()->route('admin.carburants.index')->with('success', 'Plein modifié avec succès.');
     }
 
     public function destroy(Carburant $carburant)
     {
         $carburant->delete();
-        return redirect()->route('manager.carburants.index')->with('success', 'Plein supprimé avec succès.');
+        return redirect()->route('admin.carburants.index')->with('success', 'Plein supprimé avec succès.');
     }
 }

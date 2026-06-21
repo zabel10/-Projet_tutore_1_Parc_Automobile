@@ -54,7 +54,7 @@ class BonSortieController extends Controller
             'date_retour_prevue' => $validated['date_retour_prevue'] . ' 17:00:00',
             'km_depart' => $validated['km_depart'],
             'motif' => $validated['motif'],
-            'statut' => 'valide',
+            'statut' => 'brouillon',
             'observations' => $validated['observations'] ?? null,
         ]);
 

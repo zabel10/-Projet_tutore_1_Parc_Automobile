@@ -13,14 +13,14 @@ class MissionController extends Controller
     public function index()
     {
         $missions = Mission::with(['vehicule', 'conducteur', 'createur'])->get();
-        return view('manager.missions.index', compact('missions'));
+        return view('admin.missions.index', compact('missions'));
     }
 
     public function create()
     {
         $vehicules = Vehicule::where('statut', 'disponible')->get();
         $conducteurs = Conducteur::all();
-        return view('manager.missions.create', compact('vehicules', 'conducteurs'));
+        return view('admin.missions.create', compact('vehicules', 'conducteurs'));
     }
 
     public function store(Request $request)
@@ -39,19 +39,19 @@ class MissionController extends Controller
         $validated['statut'] = 'planifiee';
 
         Mission::create($validated);
-        return redirect()->route('manager.missions.index')->with('success', 'Mission créée avec succès.');
+        return redirect()->route('admin.missions.index')->with('success', 'Mission créée avec succès.');
     }
 
     public function show(Mission $mission)
     {
-        return view('manager.missions.show', compact('mission'));
+        return view('admin.missions.show', compact('mission'));
     }
 
     public function edit(Mission $mission)
     {
         $vehicules = Vehicule::all();
         $conducteurs = Conducteur::all();
-        return view('manager.missions.edit', compact('mission', 'vehicules', 'conducteurs'));
+        return view('admin.missions.edit', compact('mission', 'vehicules', 'conducteurs'));
     }
 
     public function update(Request $request, Mission $mission)
@@ -73,12 +73,12 @@ class MissionController extends Controller
         }
 
         $mission->update($validated);
-        return redirect()->route('manager.missions.index')->with('success', 'Mission modifiée avec succès.');
+        return redirect()->route('admin.missions.index')->with('success', 'Mission modifiée avec succès.');
     }
 
     public function destroy(Mission $mission)
     {
         $mission->delete();
-        return redirect()->route('manager.missions.index')->with('success', 'Mission supprimée avec succès.');
+        return redirect()->route('admin.missions.index')->with('success', 'Mission supprimée avec succès.');
     }
 }

@@ -51,5 +51,11 @@ class RolePermissionSeeder extends Seeder
             'view_missions',
             'create_carburant',
         ]);
+
+        foreach (['admin', 'gestionnaire', 'conducteur'] as $roleValue) {
+            \App\Models\Utilisateur::where('role', $roleValue)->get()->each(function ($user) use ($roleValue) {
+                $user->syncRoles($roleValue);
+            });
+        }
     }
 }

@@ -11,12 +11,12 @@ class VehiculeController extends Controller
     public function index()
     {
         $vehicules = Vehicule::all();
-        return view('manager.vehicules.index', compact('vehicules'));
+        return view('admin.vehicules.index', compact('vehicules'));
     }
 
     public function create()
     {
-        return view('manager.vehicules.create');
+        return view('admin.vehicules.create');
     }
 
     public function store(Request $request)
@@ -34,17 +34,17 @@ class VehiculeController extends Controller
         ]);
 
         Vehicule::create($validated);
-        return redirect()->route('manager.vehicules.index')->with('success', 'Véhicule créé avec succès.');
+        return redirect()->route('admin.vehicules.index')->with('success', 'Véhicule créé avec succès.');
     }
 
     public function show(Vehicule $vehicule)
     {
-        return view('manager.vehicules.show', compact('vehicule'));
+        return view('admin.vehicules.show', compact('vehicule'));
     }
 
     public function edit(Vehicule $vehicule)
     {
-        return view('manager.vehicules.edit', compact('vehicule'));
+        return view('admin.vehicules.edit', compact('vehicule'));
     }
 
     public function update(Request $request, Vehicule $vehicule)
@@ -62,12 +62,12 @@ class VehiculeController extends Controller
         ]);
 
         $vehicule->update($validated);
-        return redirect()->route('manager.vehicules.index')->with('success', 'Véhicule modifié avec succès.');
+        return redirect()->route('admin.vehicules.index')->with('success', 'Véhicule modifié avec succès.');
     }
 
     public function destroy(Vehicule $vehicule)
     {
         $vehicule->delete();
-        return redirect()->route('manager.vehicules.index')->with('success', 'Véhicule supprimé avec succès.');
+        return redirect()->route('admin.vehicules.index')->with('success', 'Véhicule supprimé avec succès.');
     }
 }

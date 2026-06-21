@@ -12,13 +12,13 @@ class MaintenanceController extends Controller
     public function index()
     {
         $maintenances = Maintenance::with('vehicule')->get();
-        return view('manager.maintenances.index', compact('maintenances'));
+        return view('admin.maintenances.index', compact('maintenances'));
     }
 
     public function create()
     {
         $vehicules = Vehicule::all();
-        return view('manager.maintenances.create', compact('vehicules'));
+        return view('admin.maintenances.create', compact('vehicules'));
     }
 
     public function store(Request $request)
@@ -35,18 +35,18 @@ class MaintenanceController extends Controller
         ]);
 
         Maintenance::create($validated);
-        return redirect()->route('manager.maintenances.index')->with('success', 'Maintenance enregistrée avec succès.');
+        return redirect()->route('admin.maintenances.index')->with('success', 'Maintenance enregistrée avec succès.');
     }
 
     public function show(Maintenance $maintenance)
     {
-        return view('manager.maintenances.show', compact('maintenance'));
+        return view('admin.maintenances.show', compact('maintenance'));
     }
 
     public function edit(Maintenance $maintenance)
     {
         $vehicules = Vehicule::all();
-        return view('manager.maintenances.edit', compact('maintenance', 'vehicules'));
+        return view('admin.maintenances.edit', compact('maintenance', 'vehicules'));
     }
 
     public function update(Request $request, Maintenance $maintenance)
@@ -63,12 +63,12 @@ class MaintenanceController extends Controller
         ]);
 
         $maintenance->update($validated);
-        return redirect()->route('manager.maintenances.index')->with('success', 'Maintenance modifiée avec succès.');
+        return redirect()->route('admin.maintenances.index')->with('success', 'Maintenance modifiée avec succès.');
     }
 
     public function destroy(Maintenance $maintenance)
     {
         $maintenance->delete();
-        return redirect()->route('manager.maintenances.index')->with('success', 'Maintenance supprimée avec succès.');
+        return redirect()->route('admin.maintenances.index')->with('success', 'Maintenance supprimée avec succès.');
     }
 }

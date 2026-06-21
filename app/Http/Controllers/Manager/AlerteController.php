@@ -12,13 +12,13 @@ class AlerteController extends Controller
     public function index()
     {
         $alertes = Alerte::with('vehicule')->get();
-        return view('manager.alertes.index', compact('alertes'));
+        return view('admin.alertes.index', compact('alertes'));
     }
 
     public function create()
     {
         $vehicules = Vehicule::all();
-        return view('manager.alertes.create', compact('vehicules'));
+        return view('admin.alertes.create', compact('vehicules'));
     }
 
     public function store(Request $request)
@@ -32,18 +32,18 @@ class AlerteController extends Controller
         ]);
 
         Alerte::create($validated);
-        return redirect()->route('manager.alertes.index')->with('success', 'Alerte créée avec succès.');
+        return redirect()->route('admin.alertes.index')->with('success', 'Alerte créée avec succès.');
     }
 
     public function show(Alerte $alerte)
     {
-        return view('manager.alertes.show', compact('alerte'));
+        return view('admin.alertes.show', compact('alerte'));
     }
 
     public function edit(Alerte $alerte)
     {
         $vehicules = Vehicule::all();
-        return view('manager.alertes.edit', compact('alerte', 'vehicules'));
+        return view('admin.alertes.edit', compact('alerte', 'vehicules'));
     }
 
     public function update(Request $request, Alerte $alerte)
@@ -57,12 +57,12 @@ class AlerteController extends Controller
         ]);
 
         $alerte->update($validated);
-        return redirect()->route('manager.alertes.index')->with('success', 'Alerte modifiée avec succès.');
+        return redirect()->route('admin.alertes.index')->with('success', 'Alerte modifiée avec succès.');
     }
 
     public function destroy(Alerte $alerte)
     {
         $alerte->delete();
-        return redirect()->route('manager.alertes.index')->with('success', 'Alerte supprimée avec succès.');
+        return redirect()->route('admin.alertes.index')->with('success', 'Alerte supprimée avec succès.');
     }
 }
