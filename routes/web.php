@@ -39,12 +39,16 @@ use App\Http\Controllers\Driver\ProfilController;
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/presentation', [PresentationController::class, 'index'])->name('presentation');
 Route::get('/contact', [ContactController::class, 'index'])->name('contact.index');
-Route::post('/contact', [ContactController::class, 'store'])->name('contact.store');
+Route::post('/contact', [ContactController::class, 'store'])->middleware('throttle:10,1')->name('contact.store');
 
-Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-Route::post('/login', [AuthController::class, 'login']);
-Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
-Route::post('/register', [AuthController::class, 'register']);
+// Authentification protégée par le middleware guest personnalisé
+Route::middleware('guest')->group(function () {
+    Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+    Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1');
+    Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
+    Route::post('/register', [AuthController::class, 'register'])->middleware('throttle:5,1');
+});
+
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 /*
@@ -53,8 +57,8 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
-    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+Route::middleware(['auth', 'ensure.role:admin', 'throttle:120,1'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
 
     Route::resource('vehicules', AdminVehiculeController::class);
     Route::resource('conducteurs', AdminConducteurController::class);
@@ -69,7 +73,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth', 'role:gestionnaire'])->prefix('manager')->name('manager.')->group(function () {
+Route::middleware(['auth', 'ensure.role:manager', 'throttle:120,1'])->prefix('manager')->name('manager.')->group(function () {
     Route::get('/dashboard', [ManagerDashboardController::class, 'index'])->name('dashboard');
 
     Route::resource('vehicules', ManagerVehiculeController::class);
@@ -87,8 +91,13 @@ Route::middleware(['auth', 'role:gestionnaire'])->prefix('manager')->name('manag
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth', 'role:conducteur'])->prefix('driver')->name('driver.')->group(function () {
+Route::middleware(['auth', 'ensure.role:driver', 'throttle:120,1'])->prefix('driver')->name('driver.')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+    Route::get('/vehicule', [DashboardController::class, 'vehicule'])->name('vehicule');
+    Route::get('/panne', [DashboardController::class, 'panne'])->name('panne');
+    Route::post('/panne', [DashboardController::class, 'panneStore'])->name('panne.store');
+    Route::get('/historique', [DashboardController::class, 'historique'])->name('historique');
 
     Route::get('/profil', [ProfilController::class, 'edit'])->name('profil.edit');
     Route::patch('/profil', [ProfilController::class, 'update'])->name('profil.update');

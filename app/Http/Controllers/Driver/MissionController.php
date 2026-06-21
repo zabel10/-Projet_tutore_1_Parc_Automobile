@@ -18,6 +18,28 @@ class MissionController extends Controller
             ->orderByDesc('date_depart')
             ->paginate(10);
 
+        $today = now()->startOfDay();
+        foreach ($missions as $mission) {
+            if ($mission->statut === 'annulee') {
+                continue;
+            }
+
+            $depart = \Carbon\Carbon::parse($mission->date_depart)->startOfDay();
+            $retour = \Carbon\Carbon::parse($mission->date_retour)->startOfDay();
+
+            $newStatut = match (true) {
+                $today->lt($depart) => 'planifiee',
+                $today->between($depart, $retour) => 'en_cours',
+                $today->gt($retour) => 'terminee',
+                default => $mission->statut,
+            };
+
+            if ($newStatut !== $mission->statut) {
+                $mission->update(['statut' => $newStatut]);
+                $mission->statut = $newStatut;
+            }
+        }
+
         return view('driver.missions.index', compact('missions'));
     }
 

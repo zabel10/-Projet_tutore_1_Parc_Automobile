@@ -10,6 +10,7 @@ use App\Models\Maintenance;
 use App\Models\Mission;
 use App\Models\Notification;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\View;
 
 class DashboardController extends Controller
 {
@@ -69,15 +70,15 @@ class DashboardController extends Controller
             ->count();
 
         $stats = [
-            'vehicule_affecte' => $vehicule?->immatriculation ?? 'AA-123-BB',
-            'vehicule_details' => $vehicule ? "{$vehicule->marque} {$vehicule->modele} - Pick-up" : 'Toyota Hilux - Pick-up',
-            'next_mission_date' => $nextMission?->date_depart?->locale('fr')->isoFormat('D MMMM YYYY') ?? '28 Mai 2024',
-            'next_mission_destination' => $nextMission?->destination ?? 'Livraison matériel à Bobo',
+            'vehicule_affecte' => $vehicule?->immatriculation,
+            'vehicule_details' => $vehicule ? "{$vehicule->marque} {$vehicule->modele}" : null,
+            'next_mission_date' => $nextMission?->date_depart?->locale('fr')->isoFormat('D MMMM YYYY'),
+            'next_mission_destination' => $nextMission?->destination,
             'fuel_percent' => $fuelPercent,
-            'fuel_subtitle' => $latestFuel ? "{$latestFuel->quantite_litres} L / 75 L" : '49 L / 75 L',
-            'maintenance_date' => $nextMaintenance?->prochaine_echeance?->locale('fr')->isoFormat('D MMMM YYYY') ?? '12 Juin 2024',
-            'maintenance_label' => $nextMaintenance ? self::maintenanceLabel($nextMaintenance->type_maintenance) : 'Vidange + filtre',
-            'bons_count' => $bonsCount ?: 8,
+            'fuel_subtitle' => $latestFuel ? "{$latestFuel->quantite_litres} L / 75 L" : null,
+            'maintenance_date' => $nextMaintenance?->prochaine_echeance?->locale('fr')->isoFormat('D MMMM YYYY'),
+            'maintenance_label' => $nextMaintenance ? self::maintenanceLabel($nextMaintenance->type_maintenance) : null,
+            'bons_count' => $bonsCount,
             'missions_en_cours' => $missionsEnCours,
             'missions_a_venir' => $missionsAvenir,
         ];
@@ -112,10 +113,6 @@ class DashboardController extends Controller
             ];
         })->all();
 
-        if (count($notificationsList) === 0) {
-            $notificationsList = self::fallbackNotifications();
-        }
-
         $unreadNotifications = $notifications->where('lu', false)->count();
         $demandeCount = Demande::where('id_conducteur', $conducteur->id_conducteur)
             ->where('statut', 'en_attente')
@@ -138,7 +135,54 @@ class DashboardController extends Controller
             'missionsAvenir',
             'demandeCount',
             'nextMaintenance'
-        ));
+        ) + ['breadcrumbs' => [['label' => 'Tableau de bord']]]);
+    }
+
+    public function vehicule()
+    {
+        $conducteur = auth()->user()->conducteur;
+        abort_unless($conducteur, 403, 'Profil conducteur introuvable.');
+
+        $currentMission = Mission::with('vehicule')
+            ->where('id_conducteur', $conducteur->id_conducteur)
+            ->whereIn('statut', ['planifiee', 'en_cours'])
+            ->orderByDesc('date_depart')
+            ->first();
+
+        $recentBonSortie = BonSortie::with('vehicule')
+            ->where('id_conducteur', $conducteur->id_conducteur)
+            ->whereIn('statut', ['valide', 'en_cours'])
+            ->orderByDesc('date_sortie')
+            ->first();
+
+        $vehicule = $currentMission?->vehicule ?? $recentBonSortie?->vehicule;
+        $fuelPercent = $vehicule ? 75 : 0;
+
+        return view('driver.vehicule', compact('vehicule', 'fuelPercent'));
+    }
+
+    public function panne()
+    {
+        return view('driver.panne');
+    }
+
+    public function panneStore()
+    {
+        return redirect()->route('driver.panne')->with('success', 'Votre signalement a été soumis avec succès.');
+    }
+
+    public function historique()
+    {
+        $conducteur = auth()->user()->conducteur;
+        abort_unless($conducteur, 403, 'Profil conducteur introuvable.');
+
+        $missions = Mission::with('vehicule')
+            ->where('id_conducteur', $conducteur->id_conducteur)
+            ->whereIn('statut', ['terminee', 'annulee'])
+            ->orderByDesc('date_depart')
+            ->paginate(10);
+
+        return view('driver.historique', compact('missions'));
     }
 
     private static function maintenanceLabel(string $type): string

@@ -26,6 +26,7 @@ class ProfilController extends Controller
             'nom' => 'required|string|max:50',
             'prenom' => 'required|string|max:50',
             'telephone' => 'nullable|string|max:20',
+            'adresse' => 'nullable|string|max:255',
             'num_permis' => 'required|string|max:30',
             'date_expiration_permis' => 'required|date',
             'categorie_permis' => 'required|in:A,B,C,D,BE,CE',
@@ -35,6 +36,7 @@ class ProfilController extends Controller
             'nom' => $validated['nom'],
             'prenom' => $validated['prenom'],
             'telephone' => $validated['telephone'],
+            'adresse' => $validated['adresse'],
         ]);
 
         $conducteur->update([
